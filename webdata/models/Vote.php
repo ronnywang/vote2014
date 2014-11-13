@@ -620,4 +620,42 @@ class Vote
 
         return $info;
     }
+
+    public function updateData()
+    {
+        $curl = curl_init('http://download.vote2014.nat.gov.tw/running.dat');
+        curl_setopt($curl, CURLOPT_USERPWD, getenv('USER') . ':' . getenv('PASSWORD'));
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        $content = curl_exec($curl);
+        $info = curl_getinfo($curl);
+        if ($info["http_code"] != 200) {
+            throw new Exception("update data failed");
+        }
+        curl_close($curl);
+        $parsed = Vote::parseData($content);
+        foreach ($parsed->data as $row) {
+            $id = $row->{'投票種類'};
+            foreach (Vote::getVoteKeys() as $col) {
+                $id .= $row->{$col};
+            }
+            try {
+                VoteData::insert(array(
+                    'id' => $id,
+                    'data' => json_encode($row),
+                ));
+            } catch (Pix_Table_DuplicateException $e) {
+                VoteData::find($id)->update(array(
+                    'data' => json_encode($row),
+                ));
+            }
+        }
+        try {
+            VoteData::insert(array(
+                'id' => 'time',
+                'data' => $parsed->time,
+            ));
+        } catch (Pix_Table_DuplicateException $e) {
+            VoteData::find('time')->update(array('data' => $parsed->time));
+        }
+    }
 }
