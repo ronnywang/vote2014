@@ -1,5 +1,6 @@
 <?= $this->partial('/common/header.phtml', $this) ?>
 <h1>請選擇投票類型</h1>
+資料更新時間: <?= date('c', VoteData::find('time')->data) ?><br>
 <ol>
     <?php foreach (Vote::getVoteTypes() as $id => $name) { ?>
     <li>

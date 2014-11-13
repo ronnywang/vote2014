@@ -1,5 +1,6 @@
 <?= $this->partial('/common/header.phtml', $this) ?>
 <h1><?= $this->name ?></h1>
+資料更新時間: <?= date('c', VoteData::find('time')->data) ?><br>
 <ol>
     <?php foreach (Vote::getCounties() as $data) { list($provence, $county, $name) = $data; ?>
     <li>

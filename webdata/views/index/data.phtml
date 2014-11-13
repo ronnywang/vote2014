@@ -1,4 +1,5 @@
 <?= $this->partial('/common/header.phtml', $this) ?>
+資料更新時間: <?= date('c', VoteData::find('time')->data) ?><br>
 <pre>
 <?= $this->escape(json_encode(json_decode($this->data->data), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)) ?>
 </pre>
