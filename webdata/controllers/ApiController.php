@@ -2,6 +2,12 @@
 
 class ApiController extends Pix_Controller
 {
+    public function init()
+    {
+        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Methods: GET');
+    }
+
     public function countyAction()
     {
         return $this->json(Vote::getCounties());
