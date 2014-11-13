@@ -1,0 +1,11 @@
+<?= $this->partial('/common/header.phtml', $this) ?>
+<h1>請選擇投票類型</h1>
+<ol>
+    <?php foreach (Vote::getVoteTypes() as $id => $name) { ?>
+    <li>
+    <a href="/index/vote/<?= $id ?>"><?= $id ?> <?= $this->escape($name) ?></a>
+    </li>
+    <?php } ?>
+</ol>
+
+<?= $this->partial('/common/footer.phtml', $this) ?>

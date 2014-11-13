@@ -1,0 +1,11 @@
+<?= $this->partial('common/header.phtml', $this) ?>
+<h1><?= $this->name ?></h1>
+<ol>
+    <?php foreach ($this->keys as $key) { ?>
+    <li>
+    <a href="/index/data/<?= $key->id ?>"><?= $key->name ?></a>
+    </li>
+    <?php } ?>
+</ol>
+縣市清單API: <code>http://<?= getenv('API_DOMAIN') ?>/api/county</code>
+<?= $this->partial('common/footer.phtml', $this) ?>

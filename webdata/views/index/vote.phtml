@@ -1,0 +1,11 @@
+<?= $this->partial('/common/header.phtml', $this) ?>
+<h1><?= $this->name ?></h1>
+<ol>
+    <?php foreach (Vote::getCounties() as $data) { list($provence, $county, $name) = $data; ?>
+    <li>
+    <a href="/index/vote2/<?= $this->type ?>/<?= $provence ?><?= $county ?>"><?= $name ?></a>
+    </li>
+    <?php } ?>
+</ol>
+縣市清單API: <code>http://<?= getenv('API_DOMAIN') ?>/api/county</code>
+<?= $this->partial('/common/footer.phtml', $this) ?>

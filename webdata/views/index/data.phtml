@@ -1,0 +1,6 @@
+<?= $this->partial('/common/header.phtml', $this) ?>
+<pre>
+<?= $this->escape(json_encode(json_decode($this->data->data), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)) ?>
+</pre>
+API: <code>http://<?= getenv('API_DOMAIN') ?>/api/data/<?= $this->data->id ?></code>
+<?= $this->partial('/common/footer.phtml', $this) ?>
