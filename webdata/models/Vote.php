@@ -633,6 +633,11 @@ class Vote
         }
         curl_close($curl);
         $parsed = Vote::parseData($content);
+        if ($parsed->time == VoteData::find('time')->data) {
+            error_log("資料未變");
+            return;
+        }
+        error_log("更新 " . date('c', $parsed->time) . ' 資料');
         foreach ($parsed->data as $row) {
             $id = $row->{'投票種類'};
             foreach (Vote::getVoteKeys() as $col) {
