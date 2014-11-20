@@ -638,12 +638,14 @@ class Vote
             return;
         }
         error_log("更新 " . date('c', $parsed->time) . ' 資料');
+        $insert_data = array();
         foreach ($parsed->data as $row) {
             $id = $row->{'投票種類'};
             foreach (Vote::getVoteKeys() as $col) {
                 $id .= $row->{$col};
             }
-            try {
+            $insert_data[] = sprintf("('%s', '%s')", addslashes($id), addslashes(json_encode($row)));
+            /*try {
                 VoteData::insert(array(
                     'id' => $id,
                     'data' => json_encode($row),
@@ -652,7 +654,10 @@ class Vote
                 VoteData::find($id)->update(array(
                     'data' => json_encode($row),
                 ));
-            }
+            }*/
+        }
+        foreach (array_chunk($insert_data, 1000) as $chunked_data) {
+            VoteData::getDb()->query("INSERT INTO vote_data (id, data) VALUES " . implode(',', $chunked_data) . " ON DUPLICATE KEY UPDATE data = data");
         }
         try {
             VoteData::insert(array(
