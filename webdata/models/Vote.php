@@ -491,10 +491,8 @@ class Vote
         return $type;
     }
 
-    public function parseData($data)
+    public function parseData($data, $cb)
     {
-        $info = new StdClass;
-        $info->data = array();
         $data = preg_replace("#\s+#", "", $data);
         self::$pos = 0;
 
@@ -546,7 +544,9 @@ class Vote
             case 'ST':
                 $time = self::strShift($data, 10);
                 list($mm, $dd, $hh, $ii, $ss) = str_split($time, 2);
-                $info->time = mktime($hh, $ii, $ss, $mm, $dd);
+                if (!$cb('time', mktime($hh, $ii, $ss, $mm, $dd))) {
+                    return;
+                }
                 break;
             case 'T1':
             case 'T2':
@@ -592,7 +592,7 @@ class Vote
                 }
                 $d->{'應送投開票所數'} = intval(self::strShift($data, 5));
                 $d->{'已送投開票所數'} = intval(self::strShift($data, 5));
-                $info->data[] = $d;
+                $cb('data', $d);
                 break;
 
             case 'PT':
@@ -614,7 +614,7 @@ class Vote
                     $row->{'得票率'} = floatval(self::strShift($data, 7) / 100);
                     $d->rows[] = $row;
                 }
-                $info->data[] = $d;
+                $cb('data', $d);
                 break;
 
             case 'SZ':
@@ -665,7 +665,7 @@ class Vote
                     $d->{'黨籍資料'}[] = $row;
                 }
 
-                $info->data[] = $d;
+                $cb('data', $d);
                 break;
 
             default:
@@ -673,8 +673,6 @@ class Vote
                 throw new Exception("Unknown $type on " . self::$pos);
             }
         }
-
-        return $info;
     }
 
     public function updateData()
@@ -689,30 +687,27 @@ class Vote
         }
         curl_close($curl);
         error_log('parse start');
-        $parsed = Vote::parseData($content);
-        error_log('parse end');
-        if ($parsed->time == VoteData::find('time')->data) {
-            error_log("資料未變 {$parsed->time}");
-            return;
-        }
-        error_log("更新 " . date('c', $parsed->time) . ' 資料');
+
         $insert_data = array();
-        foreach ($parsed->data as $row) {
-            $id = $row->{'投票種類'};
-            foreach (Vote::getVoteKeys()[$id] as $col) {
-                $id .= $row->{$col};
+        Vote::parseData($content, function($k, $v) use ($insert_data) {
+            if ($k == 'time') {
+                if ($v == VoteData::find('time')->data) {
+                    error_log("資料未變 {$parsed->time}");
+//                    return false;
+                }
+                return true;
             }
-            $insert_data[] = sprintf("('%s', '%s')", addslashes($id), addslashes(json_encode($row)));
-            /*try {
-                VoteData::insert(array(
-                    'id' => $id,
-                    'data' => json_encode($row),
-                ));
-            } catch (Pix_Table_DuplicateException $e) {
-                VoteData::find($id)->update(array(
-                    'data' => json_encode($row),
-                ));
-            }*/
+            $id = $v->{'投票種類'};
+            foreach (Vote::getVoteKeys()[$id] as $col) {
+                $id .= $v->{$col};
+            }
+            $insert_data[] = sprintf("('%s', '%s')", addslashes($id), addslashes(json_encode($v)));
+
+            return true;
+        });
+
+        if (!$insert_data) {
+            return;
         }
         foreach (array_chunk($insert_data, 1000) as $chunked_data) {
             VoteData::getDb()->query("INSERT INTO vote_data (id, data) VALUES " . implode(',', $chunked_data) . " ON DUPLICATE KEY UPDATE data = data");
