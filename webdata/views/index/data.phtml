@@ -1,5 +1,11 @@
 <?= $this->partial('/common/header.phtml', $this) ?>
 資料更新時間: <?= date('c', VoteData::find('time')->data) ?><br>
+<?php if ($data = Candidate::findCandidateByVoteId($this->data->id)) { ?>
+<pre>
+<?= $this->escape(json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)) ?>
+</pre>
+<?php } ?>
+API: <code>http://<?= getenv('API_DOMAIN') ?>/api/candidate/<?= $this->data->id ?></code>
 <pre>
 <?= $this->escape(json_encode(json_decode($this->data->data), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)) ?>
 </pre>

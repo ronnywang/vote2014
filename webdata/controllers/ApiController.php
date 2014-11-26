@@ -24,4 +24,10 @@ class ApiController extends Pix_Controller
         return $this->json(json_decode(VoteData::find($id)->data));
     }
 
+    public function candidateAction()
+    {
+        list(, /*api*/, /*candidate*/, $id) = explode('/', $this->getURI());
+        return $this->json(Candidate::findCandidateByVoteId($id));
+    }
+
 }
