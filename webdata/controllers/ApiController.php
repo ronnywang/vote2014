@@ -18,6 +18,11 @@ class ApiController extends Pix_Controller
         return $this->json(Vote::getTowns());
     }
 
+    public function partyAction()
+    {
+        return $this->json(Vote::getParties());
+    }
+
     public function dataAction()
     {
         list(, /*api*/, /*data*/, $id) = explode('/', $this->getURI());

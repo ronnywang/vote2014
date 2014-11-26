@@ -4,6 +4,19 @@ class Vote
 {
     protected static $pos = 0;
 
+    protected static $parties = null;
+    public static function getParties()
+    {
+        if (is_null(self::$parties)) {
+            $fp = fopen(__DIR__ . '/../party.csv');
+            self::$parties = array();
+            foreach ($rows = fgetcsv($fp)) {
+                self::$parties[] = $rows;
+            }
+        }
+        return self::$parties;
+    }
+
     public static function getVoteKeys()
     {
         return array(
