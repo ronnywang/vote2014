@@ -694,12 +694,14 @@ class Vote
         error_log('parse start');
 
         $insert_data = array();
-        Vote::parseData($content, function($k, $v) use (&$insert_data) {
+        $data_time = null;
+        Vote::parseData($content, function($k, $v) use (&$insert_data, &$data_time) {
             if ($k == 'time') {
                 if ($v == VoteData::find('time')->data) {
-                    error_log("資料未變 {$parsed->time}");
+                    error_log("資料未變 {$v}");
                     return false;
                 }
+                $data_time = $v;
                 return true;
             }
             $id = $v->{'投票種類'};
@@ -723,10 +725,10 @@ class Vote
         try {
             VoteData::insert(array(
                 'id' => 'time',
-                'data' => $parsed->time,
+                'data' => $data_time,
             ));
         } catch (Pix_Table_DuplicateException $e) {
-            VoteData::find('time')->update(array('data' => $parsed->time));
+            VoteData::find('time')->update(array('data' => $data_time));
         }
     }
 }
