@@ -8,5 +8,9 @@
     </li>
     <?php } ?>
 </ol>
-
+<?php if ($t = VoteData::find('final-time')->data) { ?>
+<div class="alert alert-info" role="alert">已於 <?= date('c', $t) ?> 開票完成</div>
+<?php } else { ?>
+<div class="alert alert-info" role="alert">政黨得票率與當選人分析要等開票完成才有數據可以看</div>
+<?php } ?>
 <?= $this->partial('/common/footer.phtml', $this) ?>
