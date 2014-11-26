@@ -4,7 +4,11 @@
 <ol>
     <?php foreach (Vote::getCounties() as $data) { list($provence, $county, $name) = $data; ?>
     <li>
+    <?php if (in_array($this->type, array('PT', 'PC', 'PD'))) { ?>
+    <a href="/index/data/<?= $this->type ?><?= $provence ?><?= $county ?>"><?= $name ?></a>
+    <?php } else { ?>
     <a href="/index/vote2/<?= $this->type ?>/<?= $provence ?><?= $county ?>"><?= $name ?></a>
+    <?php } ?>
     </li>
     <?php } ?>
 </ol>
