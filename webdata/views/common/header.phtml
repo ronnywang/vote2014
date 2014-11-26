@@ -6,7 +6,6 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap.css">
 <script type="text/javascript">
-main.params = <?= json_encode($this->params) ?>;
 <?php if (getenv('GOOGLEANALYTICS_ACCOUNT')) { ?>
 var _gaq = _gaq || [];
 _gaq.push(['_setAccount', <?= json_encode(getenv('GOOGLEANALYTICS_ACCOUNT')) ?>]);
