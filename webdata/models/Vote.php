@@ -680,9 +680,9 @@ class Vote
         }
     }
 
-    public function updateData()
+    public function updateData($file, $time_key)
     {
-        $curl = curl_init('http://download.vote2014.nat.gov.tw/running.dat');
+        $curl = curl_init('http://download.vote2014.nat.gov.tw/' . $file . '.dat');
         curl_setopt($curl, CURLOPT_USERPWD, getenv('USER') . ':' . getenv('PASSWORD'));
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $content = curl_exec($curl);
@@ -695,9 +695,9 @@ class Vote
 
         $insert_data = array();
         $data_time = null;
-        Vote::parseData($content, function($k, $v) use (&$insert_data, &$data_time) {
+        Vote::parseData($content, function($k, $v) use (&$insert_data, &$data_time, $time_key) {
             if ($k == 'time') {
-                if ($v == VoteData::find('time')->data) {
+                if ($v == VoteData::find($time_key)->data) {
                     error_log("資料未變 {$v}");
                     return false;
                 }
@@ -724,11 +724,11 @@ class Vote
 
         try {
             VoteData::insert(array(
-                'id' => 'time',
+                'id' => $time_key,
                 'data' => $data_time,
             ));
         } catch (Pix_Table_DuplicateException $e) {
-            VoteData::find('time')->update(array('data' => $data_time));
+            VoteData::find($time_key)->update(array('data' => $data_time));
         }
     }
 }
