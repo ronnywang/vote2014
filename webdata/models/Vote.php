@@ -10,7 +10,7 @@ class Vote
         if (is_null(self::$parties)) {
             $fp = fopen(__DIR__ . '/../party.csv');
             self::$parties = array();
-            foreach ($rows = fgetcsv($fp)) {
+            while ($rows = fgetcsv($fp)) {
                 self::$parties[] = $rows;
             }
         }
