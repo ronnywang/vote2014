@@ -481,6 +481,11 @@ class Vote
             'PD' => '政黨得票率-鄉鎮市(原住民區)長',
             'PR' => '政黨得票率-鄉鎮市(原住民區民)代表',
             'PV' => '政黨得票率-村里長',
+            'FT' => '當選人分析-縣市議員',
+            'FC' => '當選人分析-縣市長',
+            'FD' => '當選人分析-鄉鎮市(原住民區)長',
+            'FR' => '當選人分析-鄉鎮市(原住民區民)代表',
+            'FV' => '當選人分析-村里長',
         );
     }
 
@@ -689,11 +694,11 @@ class Vote
         error_log('parse start');
 
         $insert_data = array();
-        Vote::parseData($content, function($k, $v) use ($insert_data) {
+        Vote::parseData($content, function($k, $v) use (&$insert_data) {
             if ($k == 'time') {
                 if ($v == VoteData::find('time')->data) {
                     error_log("資料未變 {$parsed->time}");
-//                    return false;
+                    return false;
                 }
                 return true;
             }
@@ -702,6 +707,10 @@ class Vote
                 $id .= $v->{$col};
             }
             $insert_data[] = sprintf("('%s', '%s')", addslashes($id), addslashes(json_encode($v)));
+            if (count($insert_data) > 1000) {
+                VoteData::getDb()->query("INSERT INTO vote_data (id, data) VALUES " . implode(',', $insert_data) . " ON DUPLICATE KEY UPDATE data = data");
+                $insert_data = array();
+            }
 
             return true;
         });
@@ -709,9 +718,8 @@ class Vote
         if (!$insert_data) {
             return;
         }
-        foreach (array_chunk($insert_data, 1000) as $chunked_data) {
-            VoteData::getDb()->query("INSERT INTO vote_data (id, data) VALUES " . implode(',', $chunked_data) . " ON DUPLICATE KEY UPDATE data = data");
-        }
+        VoteData::getDb()->query("INSERT INTO vote_data (id, data) VALUES " . implode(',', $insert_data) . " ON DUPLICATE KEY UPDATE data = data");
+
         try {
             VoteData::insert(array(
                 'id' => 'time',
