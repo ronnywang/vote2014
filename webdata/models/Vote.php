@@ -8,7 +8,7 @@ class Vote
     public static function getParties()
     {
         if (is_null(self::$parties)) {
-            $fp = fopen(__DIR__ . '/../data/party.csv');
+            $fp = fopen(__DIR__ . '/../data/party.csv', 'r');
             self::$parties = array();
             while ($rows = fgetcsv($fp)) {
                 self::$parties[] = $rows;
