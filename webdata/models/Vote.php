@@ -21,6 +21,11 @@ class Vote
             'PD' => array('省市別', '縣市別'),
             'PR' => array('省市別', '縣市別', '鄉鎮市區'),
             'PV' => array('省市別', '縣市別', '鄉鎮市區'),
+            'FT' => array('省市別', '縣市別'),
+            'FC' => array('省市別', '縣市別'),
+            'FD' => array('省市別', '縣市別'),
+            'FR' => array('省市別', '縣市別', '鄉鎮市區'),
+            'FV' => array('省市別', '縣市別', '鄉鎮市區'),
         );
     }
 
@@ -508,6 +513,11 @@ class Vote
             'PD' => array('省市別' => 1, '縣市別' => 2, '政黨總得票數' => 8, '政黨總得票率' => 7, '政黨數' => 2),
             'PR' => array('省市別' => 1, '縣市別' => 2, '鄉鎮市區' => 2, '政黨總得票數' => 8, '政黨總得票率' => 7, '政黨數' => 2),
             'PV' => array('省市別' => 1, '縣市別' => 2, '鄉鎮市區' => 2, '政黨總得票數' => 8, '政黨總得票率' => 7, '政黨數' => 2),
+            'FT' => array('省市別' => 1, '縣市別' => 2),
+            'FC' => array('省市別' => 1, '縣市別' => 2),
+            'FD' => array('省市別' => 1, '縣市別' => 2),
+            'FR' => array('省市別' => 1, '縣市別' => 2),
+            'FV' => array('省市別' => 1, '縣市別' => 2, '鄉鎮市區' => 2),
         );
         $vote_persons = array(
             'T1' => 30,
@@ -556,32 +566,32 @@ class Vote
                 $d->rows = array();
                 for ($i = 0; $i < $vote_persons[$type]; $i ++) {
                     $row = new StdClass;
-                    $row->{'候選人得票數'} = self::strShift($data, 8);
+                    $row->{'候選人得票數'} = intval(self::strShift($data, 8));
                     $mark = self::strShift($data, 1);
                     if (in_array($mark, array('*', '!', '-', '<', '?'))) {
                         $row->{'當選註記'} = $mark;
-                        $row->{'得票率'} = self::strShift($data, 5);
+                        $row->{'得票率'} = floatval(self::strShift($data, 5) / 100);
                     } elseif (preg_match('#[0-9]#', $mark)) {
-                        $row->{'得票率'} = $mark . self::strShift($data, 4);
+                        $row->{'得票率'} = floatval($mark . self::strShift($data, 4) / 100);
                     } else {
                         throw new exception("Unknown mark {$mark}");
                     }
                     $d->rows[] = $row;
                 }
-                $d->{'有效票數'} = self::strShift($data, 8);
-                $d->{'無效票數'} = self::strShift($data, 8);
-                $d->{'投票數'} = self::strShift($data, 8);
-                $d->{'已領未投票數'} = self::strShift($data, 8);
-                $d->{'發出票數'} = self::strShift($data, 8);
-                $d->{'用餘票數'} = self::strShift($data, 8);
-                $d->{'選舉人數'} = self::strShift($data, 8);
-                $d->{'投票率'} = self::strShift($data, 5);
+                $d->{'有效票數'} = intval(self::strShift($data, 8));
+                $d->{'無效票數'} = intval(self::strShift($data, 8));
+                $d->{'投票數'} = intval(self::strShift($data, 8));
+                $d->{'已領未投票數'} = intval(self::strShift($data, 8));
+                $d->{'發出票數'} = intval(self::strShift($data, 8));
+                $d->{'用餘票數'} = intval(self::strShift($data, 8));
+                $d->{'選舉人數'} = intval(self::strShift($data, 8));
+                $d->{'投票率'} = floatval(self::strShift($data, 5) / 100);
                 if (!in_array($type, array('TD', 'T4', 'T5', 'T6', 'TV'))) {
-                    $d->{'應送達鄉鎮市區數'} = self::strShift($data, 3);
-                    $d->{'已送達鄉鎮市區數'} = self::strShift($data, 3);
+                    $d->{'應送達鄉鎮市區數'} = intval(self::strShift($data, 3));
+                    $d->{'已送達鄉鎮市區數'} = intval(self::strShift($data, 3));
                 }
-                $d->{'應送投開票所數'} = self::strShift($data, 5);
-                $d->{'已送投開票所數'} = self::strShift($data, 5);
+                $d->{'應送投開票所數'} = intval(self::strShift($data, 5));
+                $d->{'已送投開票所數'} = intval(self::strShift($data, 5));
                 $info->data[] = $d;
                 break;
 
@@ -599,9 +609,9 @@ class Vote
                 $d->rows = array();
                 for ($i = 0; $i < $vote_persons[$type]; $i ++) {
                     $row = new StdClass;
-                    $row->{'政黨代碼'} = self::strShift($data, 2);
-                    $row->{'得票數'} = self::strShift($data, 8);
-                    $row->{'得票率'} = self::strShift($data, 7);
+                    $row->{'政黨代碼'} = intval(self::strShift($data, 2));
+                    $row->{'得票數'} = intval(self::strShift($data, 8));
+                    $row->{'得票率'} = floatval(self::strShift($data, 7) / 100);
                     $d->rows[] = $row;
                 }
                 $info->data[] = $d;
@@ -611,12 +621,58 @@ class Vote
                 $sign = self::strShift($data, 128);
                 break;
 
+            case 'FT':
+            case 'FC':
+            case 'FD':
+            case 'FR':
+            case 'FV':
+                $d = new StdClass;
+                $d->{'投票種類'} = $type;
+                foreach ($columns[$type] as $col => $size) {
+                    $d->{$col} = self::strShift($data, $size);
+                }
+
+                $types = array(
+                    '性別-男',
+                    '性別-女',
+                    '教育程度-博士',
+                    '教育程度-碩士',
+                    '教育程度-大學',
+                    '教育程度-專科',
+                    '教育程度-高中',
+                    '教育程度-其他',
+                );
+
+                $d->{'平均年齡'} = floatval(self::strShift($data, 5) / 100);
+                foreach ($types as $name) {
+                    list($type, $value) = explode('-', $name);
+                    if (!$d->{$type}) {
+                        $d->{$type} = new StdClass;
+                    }
+                    $d->{$type}->{$value} = new StdClass;
+                    $d->{$type}->{$value}->{'人數'} = intval(self::strShift($data, 4));
+                    $d->{$type}->{$value}->{'比率'} = floatval(self::strShift($data, 5) / 100);
+                }
+
+                $d->{'政黨數'} = intval(self::strShift($data, 2));
+
+                $d->{'黨籍資料'} = array();
+                for ($i = 0; $i < 25; $i ++) {
+                    $row = new StdClass;
+                    $row->{'政黨代碼'} = intval(self::strShift($data, 2));
+                    $row->{'當選名額'} = intval(self::strShift($data, 4));
+                    $row->{'當選比率'} = floatval(self::strShift($data, 5) / 100);
+                    $d->{'黨籍資料'}[] = $row;
+                }
+
+                $info->data[] = $d;
+                break;
+
             default:
                 var_dump($d);
                 throw new Exception("Unknown $type on " . self::$pos);
             }
         }
-
 
         return $info;
     }
@@ -632,16 +688,18 @@ class Vote
             throw new Exception("update data failed");
         }
         curl_close($curl);
+        error_log('parse start');
         $parsed = Vote::parseData($content);
+        error_log('parse end');
         if ($parsed->time == VoteData::find('time')->data) {
-            error_log("資料未變");
+            error_log("資料未變 {$parsed->time}");
             return;
         }
         error_log("更新 " . date('c', $parsed->time) . ' 資料');
         $insert_data = array();
         foreach ($parsed->data as $row) {
             $id = $row->{'投票種類'};
-            foreach (Vote::getVoteKeys() as $col) {
+            foreach (Vote::getVoteKeys()[$id] as $col) {
                 $id .= $row->{$col};
             }
             $insert_data[] = sprintf("('%s', '%s')", addslashes($id), addslashes(json_encode($row)));
