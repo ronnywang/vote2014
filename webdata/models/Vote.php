@@ -697,6 +697,7 @@ class Vote
     {
         $curl = curl_init('http://download.vote2014.nat.gov.tw/' . $file . '.dat');
         curl_setopt($curl, CURLOPT_USERPWD, getenv('USER') . ':' . getenv('PASSWORD'));
+        curl_setopt($curl, CURLOPT_TIMEOUT, 30);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $content = curl_exec($curl);
         $info = curl_getinfo($curl);
