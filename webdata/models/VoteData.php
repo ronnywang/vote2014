@@ -8,6 +8,7 @@ class VoteData extends Pix_Table
         $this->_primary = 'id';
 
         $this->_columns['id'] = array('type' => 'char', 'size' => 13);
+        $this->_columns['time'] = array('type' => 'int');
         $this->_columns['data'] = array('type' => 'text');
     }
 
