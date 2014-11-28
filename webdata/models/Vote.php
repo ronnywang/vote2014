@@ -721,9 +721,9 @@ class Vote
             foreach (Vote::getVoteKeys()[$id] as $col) {
                 $id .= $v->{$col};
             }
-            $insert_data[] = sprintf("('%s', '%s')", addslashes($id), addslashes(json_encode($v)));
+            $insert_data[] = sprintf("('%s', '%s', %d)", addslashes($id), addslashes(json_encode($v)), $data_time);
             if (count($insert_data) > 1000) {
-                VoteData::getDb()->query("INSERT INTO vote_data (id, data) VALUES " . implode(',', $insert_data) . " ON DUPLICATE KEY UPDATE data = data");
+                VoteData::getDb()->query("INSERT INTO vote_data (id, data, time) VALUES " . implode(',', $insert_data) . " ON DUPLICATE KEY UPDATE data = data, time = VALUES(time)");
                 $insert_data = array();
             }
 
@@ -733,7 +733,7 @@ class Vote
         if (!$insert_data) {
             return;
         }
-        VoteData::getDb()->query("INSERT INTO vote_data (id, data) VALUES " . implode(',', $insert_data) . " ON DUPLICATE KEY UPDATE data = data");
+        VoteData::getDb()->query("INSERT INTO vote_data (id, data, time) VALUES " . implode(',', $insert_data) . " ON DUPLICATE KEY UPDATE data = data, time = VALUES(time)");
 
         try {
             VoteData::insert(array(
