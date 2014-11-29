@@ -730,7 +730,7 @@ class Vote
 
             return true;
         });
-        if (getenv('DATA_DIR')) {
+        if (getenv('DATA_DIR') and $data_time) {
             file_put_contents(getenv('DATA_DIR') . "/{$file}-{$data_time}", $content);
         }
 
