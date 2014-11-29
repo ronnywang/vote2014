@@ -730,12 +730,12 @@ class Vote
 
             return true;
         });
+        if (getenv('DATA_DIR')) {
+            file_put_contents(getenv('DATA_DIR') . "/{$file}-{$data_time}", $content);
+        }
 
         if (!$insert_data) {
             return;
-        }
-        if (getenv('DATA_DIR')) {
-            file_put_contents(getenv('DATA_DIR') . "/{$file}-{$data_time}", $content);
         }
         VoteData::getDb()->query("INSERT INTO vote_data (id, data, time) VALUES " . implode(',', $insert_data) . " ON DUPLICATE KEY UPDATE data = VALUES(data), time = VALUES(time)");
 
