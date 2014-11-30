@@ -12,6 +12,9 @@ function array_walk_new($data, $callback, $prefix = '') {
             array_walk_new($v, $callback, trim($prefix . '/' . $k, '/'));
         } else {
             $callback($v, trim($prefix . '/' . $k, '/'));
+            if ('候選人得票數' == $k) {
+                $callback('', $prefix . '/當選註記');
+            }
         }
     }
 }
@@ -34,6 +37,8 @@ foreach (VoteData::search(1)->order('id')->volumemode(100) as $data) {
             return;
         }
         $values[$k] = $v;
+        if ('候選人得票數' == $k) {
+        }
     });
 
     if ($info->{'投票種類'} != $vote_type) {
